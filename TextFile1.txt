@@ -1,1 +1,52 @@
 ﻿ProducerApp → purchases → PurchaseProcessorApp → analytics → AnalyticsConsumerApp
+
+Kafka is a distributed event streaming platform used for building real-time data pipelines and streaming applications. It was originally developed by LinkedIn, and later open-sourced as part of the Apache Software Foundation. 
+Kafka is widely used in various industries for applications such as log aggregation, real-time analytics, event sourcing, and stream processin.
+Some common companies that most people are familiar with and that use the technology are twitter, netflix, uber, etc.
+
+Kafka works on a publish-subscribe model, where producers publish messages to topics, and consumers subscribe to those topics to receive the messages 
+For example, if I need an uber, my request gets published as a message and gets sent to the correct topic/partition, and then available drivers in my area can see and accept my request).
+
+
+It is designed to handle high throughput and low latency,
+
+High thoroughput meanign: 
+
+The system can process a large volume of data or requests per unit of time.
+
+Think of it as: How much work can be done in a second/minute/hour?
+
+Example: A Kafka cluster handling millions of messages per second.
+
+
+
+and low latency, 
+
+Meaning: The system responds very quickly to each individual request.
+
+Think of it as: How fast does a single message/request travel from start to finish?
+
+Example: Sending a message through Kafka and having a consumer receive it in a few milliseconds.
+
+
+Imagine a highway:
+
+High throughput = many lanes, thousands of cars move per minute.
+
+Low latency = each car moves quickly with minimal delay from entrance to exit.
+
+A system can have:
+
+High throughput but higher latency (e.g., a batch process moving tons of data but not instantly).
+
+Low latency but lower throughput (e.g., a quick but narrow pipe).
+
+The best systems (like Kafka) aim for both: process lots of data (throughput) while keeping individual message delays small (latency).
+
+
+Because kafka has high throughput and low latency, its a good fit for processing large volumes of data in real-time.
+It was originally developed by LinkedIn and later open-sourced as part of the Apache Software Foundation. Kafka is widely used in various industries for applications such as log aggregation, real-time analytics, event sourcing, and stream processing,
+Some common companies that use the technology are twitter, netflix, uber, etc.
+
+
+Kafka stores messages in a distributed and fault-tolerant manner across multiple brokers, ensuring high availability and durability of data.
