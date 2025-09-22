@@ -1,33 +1,20 @@
 ﻿ProducerApp → purchases → PurchaseProcessorApp → analytics → AnalyticsConsumerApp
 
 Kafka is a distributed event streaming platform used for building real-time data pipelines and streaming applications. It was originally developed by LinkedIn, and later open-sourced as part of the Apache Software Foundation. 
-Kafka is widely used in various industries for applications such as log aggregation, real-time analytics, event sourcing, and stream processin.
-Some common companies that most people are familiar with and that use the technology are twitter, netflix, uber, etc.
+Kafka is widely used in various industries for applications such as log aggregation, real-time analytics, event sourcing, and stream processing.
+Some common companies that most people are familiar with and that use the technology are twitter, netflix, uber, to name a few.
 
 Kafka works on a publish-subscribe model, where producers publish messages to topics, and consumers subscribe to those topics to receive the messages 
-For example, if I need an uber, my request gets published as a message and gets sent to the correct topic/partition, and then available drivers in my area can see and accept my request).
+For example, if I need an uber, my request gets published and is sent to the correct topic/partition, and then available drivers in my area can see and accept my request).
 
 
-It is designed to handle high throughput and low latency,
+Kafka is designed to handle high throughput and low latency,
 
-High thoroughput meanign: 
+High thoroughput meaning that the system can handle a large volume of data or requests per unit of time.
 
-The system can process a large volume of data or requests per unit of time.
+and low latency meeaning the system responds very quickly to each individual request.
 
-Think of it as: How much work can be done in a second/minute/hour?
-
-Example: A Kafka cluster handling millions of messages per second.
-
-
-
-and low latency, 
-
-Meaning: The system responds very quickly to each individual request.
-
-Think of it as: How fast does a single message/request travel from start to finish?
-
-Example: Sending a message through Kafka and having a consumer receive it in a few milliseconds.
-
+For a simple example of these concepts,
 
 Imagine a highway:
 
@@ -44,9 +31,30 @@ Low latency but lower throughput (e.g., a quick but narrow pipe).
 The best systems (like Kafka) aim for both: process lots of data (throughput) while keeping individual message delays small (latency).
 
 
-Because kafka has high throughput and low latency, its a good fit for processing large volumes of data in real-time.
-It was originally developed by LinkedIn and later open-sourced as part of the Apache Software Foundation. Kafka is widely used in various industries for applications such as log aggregation, real-time analytics, event sourcing, and stream processing,
-Some common companies that use the technology are twitter, netflix, uber, etc.
+So because kafka has high throughput and low latency, its a good fit for processing large volumes of data in real-time.
+
+For this project, I am using Kafka to stream purchase events from a producer application to a consumer application that processes and analyzes the data in real-time.
+
+To handle this, we are using confluent cloud, which is a managed service for Apache Kafka. Instead of you installing and maintaining Kafka on your own servers, Confluent Cloud runs it for you and adds extra features,
+like schema management, connectors, SQL processing, and monitoring) — without you needing to manage the infrastructure.
+
+
+
+
+
+
 
 
 Kafka stores messages in a distributed and fault-tolerant manner across multiple brokers, ensuring high availability and durability of data.
+
+
+SASL = Simple Authentication and Security Layer.
+
+It’s a standard framework that allows clients (like your producer/consumer) to prove their identity to servers (Kafka brokers) using different “mechanisms.”
+
+Think of SASL as the door lock system. The SaslMechanism you choose decides which kind of key you’re going to use.
+
+
+
+
+Confluent Cloud is basically Kafka as a fully managed service.

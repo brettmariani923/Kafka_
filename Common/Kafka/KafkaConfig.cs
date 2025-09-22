@@ -4,6 +4,7 @@ namespace Common.Kafka;
 
 public static class KafkaConfig
 {
+    //Helper to read required env vars and throw if missing
     public static (string Bootstrap, string User, string Pass) ReadRequired()
     {
         string? bootstrap = Environment.GetEnvironmentVariable("KAFKA_BOOTSTRAP");
