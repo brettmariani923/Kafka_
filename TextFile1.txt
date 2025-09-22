@@ -1,14 +1,13 @@
-﻿ProducerApp → purchases → PurchaseProcessorApp → analytics → AnalyticsConsumerApp
-
+﻿
 Kafka is a distributed event streaming platform used for building real-time data pipelines and streaming applications. It was originally developed by LinkedIn, and later open-sourced as part of the Apache Software Foundation. 
 Kafka is widely used in various industries for applications such as log aggregation, real-time analytics, event sourcing, and stream processing.
-Some common companies that most people are familiar with and that use the technology are twitter, netflix, uber, to name a few.
+Some common companies that most people are familiar with and that use the technology are twitter, netflix, and uber, to name a few.
 
 Kafka works on a publish-subscribe model, where producers publish messages to topics, and consumers subscribe to those topics to receive the messages 
-For example, if I need an uber, my request gets published and is sent to the correct topic/partition, and then available drivers in my area can see and accept my request).
+So for example, if I want food from uber eats, my request gets published by a producer, and is sent to the correct topic/partition, where subscribers, available drivers in my area, can see and accept my request through consumers.
 
 
-Kafka is designed to handle high throughput and low latency,
+Kafka is designed to handle high throughput and low latency, so that many different events can be processed in real-time.
 
 High thoroughput meaning that the system can handle a large volume of data or requests per unit of time.
 
@@ -18,20 +17,20 @@ For a simple example of these concepts,
 
 Imagine a highway:
 
-High throughput = many lanes, thousands of cars move per minute.
+High throughput = many lanes, thousands of cars entering per minute.
 
 Low latency = each car moves quickly with minimal delay from entrance to exit.
 
 A system can have:
 
-High throughput but higher latency (e.g., a batch process moving tons of data but not instantly).
+High throughput but higher latency (a lot of cars but slow traffic).
 
-Low latency but lower throughput (e.g., a quick but narrow pipe).
+Low latency but lower throughput (small highway, but fast travel).
 
 The best systems (like Kafka) aim for both: process lots of data (throughput) while keeping individual message delays small (latency).
 
-
 So because kafka has high throughput and low latency, its a good fit for processing large volumes of data in real-time.
+
 
 For this project, I am using Kafka to stream purchase events from a producer application to a consumer application that processes and analyzes the data in real-time.
 
@@ -39,22 +38,69 @@ To handle this, we are using confluent cloud, which is a managed service for Apa
 like schema management, connectors, SQL processing, and monitoring) — without you needing to manage the infrastructure.
 
 
+Alright so now that we understand what Kafka is, and why and how we are using it, lets look at the architecture of our project.
+
+the project has three main components:
 
 
+ProducerApp (writes data) →
+
+purchases topic (raw event stream) →
+
+PurchaseProcessorApp (consumes, validates, republishes) →
+
+analytics topic (clean/processed stream) →
+
+AnalyticsConsumerApp (final consumer: stores, analyzes, displays).
 
 
+1. ProducerApp → purchases
 
+ProducerApp is your event generator. In the code, it’s creating PurchaseEvent objects (user, item, timestamp).
 
-Kafka stores messages in a distributed and fault-tolerant manner across multiple brokers, ensuring high availability and durability of data.
+Each event is published to the Kafka topic named purchases.
 
+Think of the purchases topic as a durable, ordered log where all purchase events go.
 
-SASL = Simple Authentication and Security Layer.
+2. purchases → PurchaseProcessorApp
 
-It’s a standard framework that allows clients (like your producer/consumer) to prove their identity to servers (Kafka brokers) using different “mechanisms.”
+PurchaseProcessorApp is a Kafka consumer application.
 
-Think of SASL as the door lock system. The SaslMechanism you choose decides which kind of key you’re going to use.
+It subscribes to the purchases topic.
 
+For every purchase event it reads, it:
 
+Validates/enriches the data (e.g., check formatting, add metadata).
 
+Produces a new event (if valid) to another Kafka topic, analytics.
 
-Confluent Cloud is basically Kafka as a fully managed service.
+So it’s acting as a middleman/processor: consuming from one topic, producing to another.
+
+3. analytics → AnalyticsConsumerApp
+
+AnalyticsConsumerApp is another consumer application.
+
+It subscribes to the analytics topic.
+
+Here you might:
+
+Aggregate statistics (total items sold, most popular product).
+
+Store data in a database or dashboard.
+
+Power real-time analytics or monitoring systems.
+
+-------------------------------------------------------------
+
+So to put it together
+
+ProducerApp (writes data) →
+
+purchases topic (raw event stream) →
+
+PurchaseProcessorApp (consumes, validates, republishes) →
+
+analytics topic (clean/processed stream) →
+
+AnalyticsConsumerApp (final consumer: stores, analyzes, displays).
+

@@ -27,15 +27,15 @@ public static class KafkaConfig
         return new ProducerConfig
         {
             BootstrapServers = bootstrap,
-            SecurityProtocol = SecurityProtocol.SaslSsl,
-            SaslMechanism = SaslMechanism.Plain,
+            SecurityProtocol = SecurityProtocol.SaslSsl, //simple auth security layer over TLS
+            SaslMechanism = SaslMechanism.Plain, //username/password auth
             SaslUsername = user,
             SaslPassword = pass,
-            Acks = Acks.All
+            Acks = Acks.All //wait for all replicas to ack
         };
     }
 
-    public static ConsumerConfig BuildConsumer(string groupId, AutoOffsetReset offset = AutoOffsetReset.Earliest)
+    public static ConsumerConfig BuildConsumer(string groupId, AutoOffsetReset offset = AutoOffsetReset.Earliest) //default to read from start if no offset stored
     {
         var (bootstrap, user, pass) = ReadRequired();
         return new ConsumerConfig
@@ -45,11 +45,11 @@ public static class KafkaConfig
             SaslMechanism = SaslMechanism.Plain,
             SaslUsername = user,
             SaslPassword = pass,
-            GroupId = groupId,
-            AutoOffsetReset = offset,
-            EnableAutoCommit = true,
-            SessionTimeoutMs = 45_000,
-            SocketKeepaliveEnable = true
+            GroupId = groupId, //consumers in same group share work of reading from partitions
+            AutoOffsetReset = offset, //where to start if no offset is stored
+            EnableAutoCommit = true, //Tells consumer to periodically commit offsets in background
+            SessionTimeoutMs = 45_000, //consumer must send within this time
+            SocketKeepaliveEnable = true //keep TCP connection alive
         };
     }
 }
