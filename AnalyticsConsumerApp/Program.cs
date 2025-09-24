@@ -15,7 +15,7 @@ class Program
         var itemCount = new Dictionary<string, int>();
 
         using var consumer = new ConsumerBuilder<string, string>(config).Build(); //creates consumer using the config object (key/ string value)
-        consumer.Subscribe(KafkaTopics.Analytics); //subscribe to analytics topic
+        consumer.Subscribe(KafkaTopics.Analytics); //subscribe to analytics
 
         Console.CancelKeyPress += (_, e) => { e.Cancel = true; consumer.Close(); }; //Ctrl+C shutdown
 
@@ -26,8 +26,8 @@ class Program
             try
             {
                 var cr = consumer.Consume(CancellationToken.None); //keeps reading messages, blocking call that waits for new message
-                var evt = JsonSerializer.Deserialize<PurchaseEvent>(cr.Message.Value); //deserializes json payload into PurchaseEvent object
-                if (evt is null) //skips invalid json messages
+                var evt = JsonSerializer.Deserialize<PurchaseEvent>(cr.Message.Value); //coverts json into PurchaseEvent object
+                if (evt is null) //skips bad messages
                 {
                     Console.WriteLine("⚠️ Skipped invalid JSON."); 
                     continue;

@@ -1,0 +1,66 @@
+﻿
+the project has 5 main components:
+
+
+ProducerApp (writes data) →
+
+purchases topic (raw event stream) →
+
+PurchaseProcessorApp (consumes, validates, republishes) →
+
+analytics topic (clean/processed stream) →
+
+AnalyticsConsumerApp (final consumer: stores, analyzes, displays).
+
+
+
+1. ProducerApp → purchases
+
+ProducerApp is your event generator. In the code, it’s creating PurchaseEvent objects (user, item, timestamp).
+
+Each event is published to the Kafka topic named purchases.
+
+Think of the purchases topic as a durable, ordered log where all purchase events go.
+
+2. purchases → PurchaseProcessorApp
+
+PurchaseProcessorApp is a Kafka consumer application.
+
+It subscribes to the purchases topic.
+
+For every purchase event it reads, it:
+
+Validates/enriches the data (e.g., check formatting, add metadata).
+
+Produces a new event (if valid) to another Kafka topic, analytics.
+
+So it’s acting as a middleman/processor: consuming from one topic, producing to another.
+
+3. analytics → AnalyticsConsumerApp
+
+AnalyticsConsumerApp is another consumer application.
+
+It subscribes to the analytics topic.
+
+Here you might:
+
+Aggregate statistics (total items sold, most popular product).
+
+Store data in a database or dashboard.
+
+Power real-time analytics or monitoring systems.
+
+-------------------------------------------------------------
+
+So to put it together
+
+ProducerApp (writes data) →
+
+purchases topic (raw event stream) →
+
+PurchaseProcessorApp (consumes, validates, republishes) →
+
+analytics topic (clean/processed stream) →
+
+AnalyticsConsumerApp (final consumer: stores, analyzes, displays).
+

@@ -1,7 +1,6 @@
 ﻿using Common;
 using Common.Kafka;
 using Common.Models;
-using Confluent.Kafka;
 
 class Program
 {
@@ -12,10 +11,10 @@ class Program
         var producer = new KafkaProducerService(producerConfig); //creates instance of kafka producer service using the config object
 
         var random = new Random();
-        string[] users = { "eabara", "jsmith", "sgarcia", "jbernard", "htanaka" };
-        string[] items = { "book", "alarm clock", "t-shirts", "gift card", "batteries" };
+        string[] users = { "sUchia", "bMariani", "hKakashi", "rLee", "nUzumaki" };
+        string[] items = { "scrolls", "kunai", "shuriken", "food pills", "ramen" };
 
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 10; i++)
         {
             var user = users[random.Next(users.Length)];
             var item = items[random.Next(items.Length)];
