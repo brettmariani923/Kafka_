@@ -8,57 +8,55 @@ class Program
 {
     static void Main(string[] args)
     {
-        //analytics consumer,final stage of the pipeline
-        var config = KafkaConfig.BuildConsumer(groupId: "analytics-consumer"); //builds consumer config object w/ settings
+        var config = KafkaConfig.BuildConsumer(groupId: "analytics-consumer");
 
-        var userPurchaseCount = new Dictionary<string, int>(); //in-memory dictionaries to track purchases per user and item counts
+        var userPurchaseCount = new Dictionary<string, int>();
         var itemCount = new Dictionary<string, int>();
 
-        using var consumer = new ConsumerBuilder<string, string>(config).Build(); //creates consumer using the config object (key/ string value)
-        consumer.Subscribe(KafkaTopics.Analytics); //subscribe to analytics
+        using var consumer = new ConsumerBuilder<string, string>(config).Build();
 
-        Console.CancelKeyPress += (_, e) => { e.Cancel = true; consumer.Close(); }; //Ctrl+C shutdown
+        var cts = new CancellationTokenSource();
+        Console.CancelKeyPress += (_, e) => { e.Cancel = true; cts.Cancel(); };
 
+        consumer.Subscribe(KafkaTopics.Analytics);
         Console.WriteLine($"📊 Listening to topic: {KafkaTopics.Analytics}");
 
-        while (true) //main loop to consume messages, 
+        try
         {
-            try
+            while (!cts.IsCancellationRequested)
             {
-                var cr = consumer.Consume(CancellationToken.None); //keeps reading messages, blocking call that waits for new message
-                var evt = JsonSerializer.Deserialize<PurchaseEvent>(cr.Message.Value); //coverts json into PurchaseEvent object
-                if (evt is null) //skips bad messages
+                var cr = consumer.Consume(cts.Token); // token-aware consume
+
+                var evt = JsonSerializer.Deserialize<PurchaseEvent>(cr.Message.Value);
+                if (evt is null)
                 {
-                    Console.WriteLine("⚠️ Skipped invalid JSON."); 
+                    Console.WriteLine("⚠️ Skipped invalid JSON.");
                     continue;
                 }
 
-                userPurchaseCount[evt.UserId] = userPurchaseCount.GetValueOrDefault(evt.UserId) + 1; //updates in-memory counts
+                userPurchaseCount[evt.UserId] = userPurchaseCount.GetValueOrDefault(evt.UserId) + 1;
                 itemCount[evt.Item] = itemCount.GetValueOrDefault(evt.Item) + 1;
 
-                Console.WriteLine($"🧾 {evt.UserId} bought {evt.Item}"); //logs each purchase event
+                Console.WriteLine($"🧾 {evt.UserId} bought {evt.Item}");
 
-                if ((userPurchaseCount[evt.UserId] + itemCount[evt.Item]) % 5 == 0) //every 5th event, prints current analytics snapshot
+                if ((userPurchaseCount[evt.UserId] + itemCount[evt.Item]) % 5 == 0)
                 {
                     Console.WriteLine("\n📈 Current Analytics Snapshot:");
-                    Console.WriteLine("👥 Purchases per user:"); //how many purchases made by each user
-                    foreach (var kv in userPurchaseCount)
-                        Console.WriteLine($"  - {kv.Key}: {kv.Value}");
-
-                    Console.WriteLine("📦 Items purchased:"); //how many times each item has been purchased
-                    foreach (var kv in itemCount)
-                        Console.WriteLine($"  - {kv.Key}: {kv.Value}");
+                    Console.WriteLine("👥 Purchases per user:");
+                    foreach (var kv in userPurchaseCount) Console.WriteLine($"  - {kv.Key}: {kv.Value}");
+                    Console.WriteLine("📦 Items purchased:");
+                    foreach (var kv in itemCount) Console.WriteLine($"  - {kv.Key}: {kv.Value}");
                     Console.WriteLine();
                 }
             }
-            catch (ConsumeException ex) //error handling 
-            {
-                Console.WriteLine($"💥 Kafka error: {ex.Error.Reason}");
-            }
-            catch (JsonException)
-            {
-                Console.WriteLine("⚠️ Failed to parse JSON.");
-            }
+        }
+        catch (OperationCanceledException)
+        {
+            Console.WriteLine("🛑 Graceful shutdown.");
+        }
+        finally
+        {
+            consumer.Close(); // commit final offsets & leave group cleanly
         }
     }
 }
